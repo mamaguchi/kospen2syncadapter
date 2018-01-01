@@ -1,19 +1,32 @@
 package com.example.intel.kospenmove02;
 
 import android.accounts.Account;
+import android.app.Activity;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
 
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +48,10 @@ import java.util.List;
  * SyncService.
  */
 class SyncAdapter extends AbstractThreadedSyncAdapter {
-    public static final String TAG = "SyncAdapter";
+    public static final String TAG = SyncAdapter.class.getSimpleName();
+
+    private RequestQueue queue;
+    private String url = "http://192.168.10.10/api/kospenusers";
 
     /**
      * Content resolver, for performing database operations.
@@ -78,11 +94,35 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
-        Log.i(TAG, "Beginning patrick chow network synchronization");
+        Log.i(TAG, "Beginning patrick-chow network synchronization");
 
-        // Data transfer code here
+        // *** Data transfer code here ***
 
-        Log.i(TAG, "Patrick chow network synchronization complete");
+        // ========== StringRequest ==========
+        StringRequest request = new StringRequest(
+                Request.Method.GET,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Intent i = new Intent(getContext(), ApiResultActivity.class);
+                        i.putExtra("apiResult", response);
+                        getContext().startActivity(i);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Intent i = new Intent(getContext(), ApiResultActivity.class);
+                        i.putExtra("apiResult", "REST api didnt work!");
+                        getContext().startActivity(i);
+                    }});
+
+        MySingleton.getInstance(getContext()).addToRequestQueue(request);
+
+
+        Log.i(TAG, "Patrick-chow network synchronization complete");
+        syncResult.clear();
     }
 
 

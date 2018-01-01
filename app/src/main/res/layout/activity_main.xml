@@ -171,4 +171,14 @@
         android:onClick="deleteButtonClicked"
         android:text="DELETE" />
 
+    <Button
+        android:id="@+id/syncButtonId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView5"
+        android:layout_alignStart="@+id/textView5"
+        android:layout_alignTop="@+id/testOutputId"
+        android:onClick="syncButtonClicked"
+        android:text="Sync" />
+
 </RelativeLayout>

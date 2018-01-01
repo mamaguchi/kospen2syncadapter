@@ -2,6 +2,7 @@ package com.example.intel.kospenmove02;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -17,6 +18,8 @@ import android.widget.EditText;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.intel.kospenmove02.accounts.GenericAccountService;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private Spinner birthdayYearSpinner;
     private Spinner genderSpinner;
     private Button testButton;
+    private Button syncButton;
 
     private MyDBHandler dbHandler;
 
@@ -61,8 +65,11 @@ public class MainActivity extends AppCompatActivity {
         genderSpinner = (Spinner) findViewById(R.id.genderId);
         testButton = (Button) findViewById(R.id.testButtonId);
 
-        /** Create the dummy account */
-        mAccount = CreateSyncAccount(this);
+        /* syncButton to trigger REST Api call */
+        syncButton = (Button) findViewById(R.id.syncButtonId);
+
+        /* Create the dummy account */
+        CreateSyncAccount(this);
 
         // Initialization - END
 
@@ -74,16 +81,33 @@ public class MainActivity extends AppCompatActivity {
      * @param context The application context
      */
     public static Account CreateSyncAccount(Context context) {
-        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        //Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        Account newAccount = GenericAccountService.GetAccount();
         AccountManager accountManager = (AccountManager) context.getSystemService(
                 ACCOUNT_SERVICE);
 
         if(accountManager.addAccountExplicitly(newAccount, null, null)) {
+            ContentResolver.setIsSyncable(newAccount, AUTHORITY, 1);
+            ContentResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
             return newAccount;
         } else {
-            Log.d(TAG, "Account exist or error occured in adding account!");
-            throw new NullPointerException("Account exist or error occured in adding account!");
+//            Log.d(TAG, "Account exist or error occured in adding account!");
+//            throw new NullPointerException("Account exist or error occured in adding account!");
+            Account[] accounts = accountManager.getAccountsByType(ACCOUNT_TYPE);
+            return accounts[0];
         }
+    }
+
+
+    public void syncButtonClicked(View view) {
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+
+        ContentResolver.requestSync(
+                GenericAccountService.GetAccount(),
+                AUTHORITY,
+                settingsBundle);
     }
 
     public void testButtonClicked(View view){
