@@ -53,7 +53,8 @@
         </service>
         <service
             android:name=".SyncService"
-            android:exported="true">
+            android:exported="true"
+            android:process=":sync">
 
             <!--
             This intent filter is required. It allows the system to launch our sync service

@@ -21,12 +21,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +41,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Define a sync adapter for the app.
@@ -98,15 +103,42 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         // *** Data transfer code here ***
 
-        // ========== StringRequest ==========
-        StringRequest request = new StringRequest(
-                Request.Method.GET,
+//        // ========== StringRequest - GET ==========
+//        StringRequest request = new StringRequest(
+//                Request.Method.GET,
+//                url,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        Intent i = new Intent(getContext(), ApiResultActivity.class);
+//                        i.putExtra("apiResult", response);
+//                        getContext().startActivity(i);
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Intent i = new Intent(getContext(), ApiResultActivity.class);
+//                        i.putExtra("apiResult", "REST api didnt work!");
+//                        getContext().startActivity(i);
+//                    }});
+
+        // ========== StringRequest - POST ==========
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "bellio7");
+        JSONObject parameters = new JSONObject(params);
+
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
                 url,
-                new Response.Listener<String>() {
+                parameters,
+                new Response.Listener<JSONObject >() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject  response) {
                         Intent i = new Intent(getContext(), ApiResultActivity.class);
-                        i.putExtra("apiResult", response);
+                        i.putExtra("apiResult", "Successful POST: " + response.toString());
                         getContext().startActivity(i);
                     }
                 },
@@ -114,9 +146,21 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Intent i = new Intent(getContext(), ApiResultActivity.class);
-                        i.putExtra("apiResult", "REST api didnt work!");
+                        i.putExtra("apiResult", "Failed POST: " + error.toString());
                         getContext().startActivity(i);
-                    }});
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+
+
+
 
         MySingleton.getInstance(getContext()).addToRequestQueue(request);
 

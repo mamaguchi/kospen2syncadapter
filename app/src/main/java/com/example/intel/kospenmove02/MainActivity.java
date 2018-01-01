@@ -32,7 +32,9 @@ public class MainActivity extends AppCompatActivity {
     private Spinner birthdayYearSpinner;
     private Spinner genderSpinner;
     private Button testButton;
-    private Button syncButton;
+    private Button syncGetButton;
+    private Button syncPostButton;
+    private Button syncDelButton;
 
     private MyDBHandler dbHandler;
 
@@ -66,7 +68,9 @@ public class MainActivity extends AppCompatActivity {
         testButton = (Button) findViewById(R.id.testButtonId);
 
         /* syncButton to trigger REST Api call */
-        syncButton = (Button) findViewById(R.id.syncButtonId);
+        syncGetButton = (Button) findViewById(R.id.syncGetButtonId);
+        syncPostButton = (Button) findViewById(R.id.syncPostButtonId);
+        syncDelButton = (Button) findViewById(R.id.syncDelButtonId);
 
         /* Create the dummy account */
         CreateSyncAccount(this);
@@ -99,7 +103,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void syncButtonClicked(View view) {
+//    public void syncGetButtonClicked(View view) {
+//        Bundle settingsBundle = new Bundle();
+//        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+//        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+//
+//        ContentResolver.requestSync(
+//                GenericAccountService.GetAccount(),
+//                AUTHORITY,
+//                settingsBundle);
+//    }
+
+    public void syncPostButtonClicked(View view) {
         Bundle settingsBundle = new Bundle();
         settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
