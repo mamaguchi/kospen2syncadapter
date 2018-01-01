@@ -1,6 +1,9 @@
 package com.example.intel.kospenmove02;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -12,8 +15,11 @@ import android.widget.Toast;
 import android.widget.Button;
 import android.widget.EditText;
 import android.net.Uri;
+import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "MainActivity";
 
     private EditText ic;
     private EditText name;
@@ -27,6 +33,15 @@ public class MainActivity extends AppCompatActivity {
     private MyDBHandler dbHandler;
 
     private TextView testOutput;
+
+    // Authority for sync adapter's content provider
+    public static final String AUTHORITY = "com.kospen.kospenusersprovider.provider";
+    // Account type, in the form of domain name for sync adapter
+    public static final String ACCOUNT_TYPE = "com.example.android.network.sync.basicsyncadapter";
+    // Account name
+    public static final String ACCOUNT = "dummyaccount";
+    // Variable to hold an instance of Account
+    Account mAccount;
 
 
     @Override
@@ -45,9 +60,30 @@ public class MainActivity extends AppCompatActivity {
         birthdayYearSpinner = (Spinner) findViewById(R.id.birthdayYearId);
         genderSpinner = (Spinner) findViewById(R.id.genderId);
         testButton = (Button) findViewById(R.id.testButtonId);
+
+        /** Create the dummy account */
+        mAccount = CreateSyncAccount(this);
+
         // Initialization - END
 
         printDatabase();
+    }
+
+    /** Create a new dummy account for the sync adapter
+     *
+     * @param context The application context
+     */
+    public static Account CreateSyncAccount(Context context) {
+        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        AccountManager accountManager = (AccountManager) context.getSystemService(
+                ACCOUNT_SERVICE);
+
+        if(accountManager.addAccountExplicitly(newAccount, null, null)) {
+            return newAccount;
+        } else {
+            Log.d(TAG, "Account exist or error occured in adding account!");
+            throw new NullPointerException("Account exist or error occured in adding account!");
+        }
     }
 
     public void testButtonClicked(View view){
@@ -86,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         sb.append("-");
         sb.append(str_birthdayMonth);
         sb.append("-");
-        sb.append(str_birthdayYear);;
+        sb.append(str_birthdayYear);
 
         String str_gender = String.valueOf(genderSpinner.getSelectedItem());
         String str_address = address.getText().toString();
