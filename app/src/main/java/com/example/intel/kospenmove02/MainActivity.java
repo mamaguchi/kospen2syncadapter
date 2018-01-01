@@ -125,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
                 settingsBundle);
     }
 
+
+
     public void testButtonClicked(View view){
 //        // Test 1 - to test the input-output function of Spinner
 //        String birthdayDay = String.valueOf(birthdayDaySpinner.getSelectedItem());

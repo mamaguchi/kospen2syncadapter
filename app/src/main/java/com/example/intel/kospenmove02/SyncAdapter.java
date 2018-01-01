@@ -26,10 +26,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -56,7 +58,7 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = SyncAdapter.class.getSimpleName();
 
     private RequestQueue queue;
-    private String url = "http://192.168.10.10/api/kospenusers";
+    private String kospenusersUrl = "http://192.168.10.10/api/kospenusers";
 
     /**
      * Content resolver, for performing database operations.
@@ -103,10 +105,10 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         // *** Data transfer code here ***
 
-//        // ========== StringRequest - GET ==========
+//        // ========== StringRequest - GET version 1.0 ==========
 //        StringRequest request = new StringRequest(
 //                Request.Method.GET,
-//                url,
+//                kospenusersUrl,
 //                new Response.Listener<String>() {
 //                    @Override
 //                    public void onResponse(String response) {
@@ -123,16 +125,45 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
 //                        getContext().startActivity(i);
 //                    }});
 
-        // ========== StringRequest - POST ==========
 
+//        // ========== StringRequest - GET version 2.0 ==========
+//        JsonArrayRequest request = new JsonArrayRequest(
+//                Request.Method.GET,
+//                kospenusersUrl,
+//                null,
+//                new Response.Listener<JSONArray>() {
+//                    @Override
+//                    public void onResponse(JSONArray  response) {
+//                        Intent i = new Intent(getContext(), ApiResultActivity.class);
+//                        i.putExtra("apiResult", "Successful GET: " + response.toString());
+//                        getContext().startActivity(i);
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Intent i = new Intent(getContext(), ApiResultActivity.class);
+//                        i.putExtra("apiResult", "Failed GET: " + error.toString());
+//                        getContext().startActivity(i);
+//                    }
+//                }) {
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                HashMap<String, String> headers = new HashMap<String, String>();
+//                headers.put("Content-Type", "application/json");
+//                return headers;
+//            }
+//        };
+
+
+
+        // ========== StringRequest - POST ==========
         Map<String, String> params = new HashMap<>();
         params.put("name", "bellio7");
         JSONObject parameters = new JSONObject(params);
-
-
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.POST,
-                url,
+                kospenusersUrl,
                 parameters,
                 new Response.Listener<JSONObject >() {
                     @Override
@@ -157,9 +188,6 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
                 return headers;
             }
         };
-
-
-
 
 
         MySingleton.getInstance(getContext()).addToRequestQueue(request);
